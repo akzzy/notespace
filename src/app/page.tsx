@@ -1,17 +1,17 @@
 import { CreateSpaceButton } from '@/components/CreateSpaceButton';
+import { JoinSpaceForm } from '@/components/JoinSpaceForm';
 import { Icons } from '@/components/Icons';
+import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <header className="container mx-auto z-40">
         <div className="flex h-20 items-center justify-between py-6">
-          <div className="flex gap-6 md:gap-10">
-            <a href="/" className="flex items-center space-x-2">
-              <Icons.logo className="h-8 w-8 text-primary" />
-              <span className="font-bold text-lg">NoteSpace</span>
-            </a>
-          </div>
+          <a href="/" className="flex items-center space-x-2">
+            <Icons.logo className="h-8 w-8 text-primary" />
+            <span className="font-bold text-lg">NoteSpace</span>
+          </a>
         </div>
       </header>
       <main className="flex-1">
@@ -28,6 +28,23 @@ export default function Home() {
           </p>
           <div className="mt-6">
             <CreateSpaceButton />
+          </div>
+          
+          <div className="mt-12 w-full max-w-md">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 w-full max-w-sm">
+            <JoinSpaceForm />
           </div>
         </div>
       </main>
