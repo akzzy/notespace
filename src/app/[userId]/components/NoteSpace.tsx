@@ -51,7 +51,7 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
   });
   
   const handleTextareaInput = (el: HTMLTextAreaElement) => {
-    const maxScreenHeight = window.innerHeight * 0.75;
+    const maxScreenHeight = window.innerHeight * 0.6;
     el.style.height = 'auto';
     const newHeight = Math.min(el.scrollHeight, maxScreenHeight);
     el.style.height = `${newHeight}px`;
