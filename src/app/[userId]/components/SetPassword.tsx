@@ -58,7 +58,7 @@ export default function SetPassword({ userId }: SetPasswordProps) {
                 <form action={formAction} className="flex items-end gap-4">
                     <input type="hidden" name="userId" value={userId} />
                     <div className="flex-1 space-y-2">
-                        <Label htmlFor="set-password">New Password (min. 6 characters)</Label>
+                        <Label htmlFor="set-password">New Password (min. 2 characters)</Label>
                         <Input id="set-password" name="password" type="password" required />
                     </div>
                     <SubmitButton />

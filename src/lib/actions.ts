@@ -62,7 +62,7 @@ export async function deleteNoteAction(userId: string, noteId: string) {
 
 const SetPasswordSchema = z.object({
     userId: z.string().length(4),
-    password: z.string().min(6, 'Password must be at least 6 characters.'),
+    password: z.string().min(2, 'Password must be at least 2 characters.'),
 });
 
 export async function setPasswordAction(prevState: { message: string, ok: boolean}, formData: FormData) {
