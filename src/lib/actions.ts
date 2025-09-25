@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import * as db from './db';
 import { z } from 'zod';
 
@@ -56,5 +57,74 @@ export async function deleteNoteAction(userId: string, noteId: string) {
         return { ok: false, message: 'Failed to find note to delete.'};
     } catch (e) {
         return { ok: false, message: 'Failed to delete note.' };
+    }
+}
+
+const SetPasswordSchema = z.object({
+    userId: z.string().length(4),
+    password: z.string().min(6, 'Password must be at least 6 characters.'),
+});
+
+export async function setPasswordAction(prevState: { message: string, ok: boolean}, formData: FormData) {
+    const validatedFields = SetPasswordSchema.safeParse({
+        userId: formData.get('userId'),
+        password: formData.get('password'),
+    });
+
+    if (!validatedFields.success) {
+        return { message: validatedFields.error.errors.map(e => e.message).join(', '), ok: false };
+    }
+
+    const { userId, password } = validatedFields.data;
+
+    try {
+        await db.setPassword(userId, password);
+        // Set auth cookie after setting password
+        const cookieStore = cookies();
+        cookieStore.set(`notesspace-auth-${userId}`, 'true', {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 7, // 1 week
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+        });
+        revalidatePath(`/${userId}`);
+        return { message: 'Password set successfully!', ok: true };
+    } catch (e) {
+        return { message: 'Failed to set password.', ok: false };
+    }
+}
+
+const VerifyPasswordSchema = z.object({
+    userId: z.string().length(4),
+    password: z.string().min(1, 'Password cannot be empty.'),
+});
+
+
+export async function verifyPasswordAction(prevState: { message: string }, formData: FormData) {
+    const validatedFields = VerifyPasswordSchema.safeParse({
+        userId: formData.get('userId'),
+        password: formData.get('password'),
+    });
+
+    if (!validatedFields.success) {
+        return { message: "Invalid data." };
+    }
+
+    const { userId, password } = validatedFields.data;
+
+    const isCorrect = await db.checkPassword(userId, password);
+
+    if (isCorrect) {
+        const cookieStore = cookies();
+        cookieStore.set(`notesspace-auth-${userId}`, 'true', {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 7, // 1 week
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+        });
+        revalidatePath(`/${userId}`);
+        return { message: "Success" };
+    } else {
+        return { message: "Incorrect password." };
     }
 }

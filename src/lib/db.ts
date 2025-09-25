@@ -21,8 +21,22 @@ const notesStore: Record<string, Note[]> = {
     ]
 };
 
+const passwordStore: Record<string, string> = {}; // userId -> hashedPassword
+
 // Simulate network latency
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+const hashPassword = (password: string) => {
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+    return `${salt}:${hash}`;
+}
+
+const verifyPassword = (password: string, storedHash: string) => {
+    const [salt, hash] = storedHash.split(':');
+    const hashToVerify = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+    return hash === hashToVerify;
+}
 
 export async function getNotes(userId: string): Promise<Note[]> {
   await delay(300);
@@ -75,4 +89,26 @@ export async function deleteNote(userId: string, noteId: string): Promise<{ id: 
     return { id: noteId };
   }
   return null;
+}
+
+
+export async function setPassword(userId: string, password: string): Promise<boolean> {
+    await delay(200);
+    if (!notesStore[userId] && userId !== '123456') { // Allow setting password for new spaces
+        notesStore[userId] = [];
+    }
+    passwordStore[userId] = hashPassword(password);
+    return true;
+}
+
+export async function getPasswordHash(userId: string): Promise<string | null> {
+    await delay(100);
+    return passwordStore[userId] || null;
+}
+
+export async function checkPassword(userId: string, password: string): Promise<boolean> {
+    await delay(200);
+    const hash = await getPasswordHash(userId);
+    if (!hash) return false; // Should not happen if this function is called correctly
+    return verifyPassword(password, hash);
 }
