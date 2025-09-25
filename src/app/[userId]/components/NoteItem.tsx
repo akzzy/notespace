@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useTransition } from 'react';
 import { formatDistanceToNow } from 'date-fns';
-import { Pencil, Trash2, CheckCircle, Loader2, AlertTriangle, Save } from 'lucide-react';
+import { Pencil, Trash2, CheckCircle, Loader2, AlertTriangle, Save, Copy, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/use-debounce';
 
@@ -39,6 +39,8 @@ export default function NoteItem({ note, onDelete, onUpdate }: NoteItemProps) {
   const [isDeletePending, startDeleteTransition] = useTransition();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const { toast } = useToast();
+  const [isCopied, setIsCopied] = useState(false);
+
 
   const handleUpdate = async () => {
     if (debouncedContent === note.content) return;
@@ -86,6 +88,24 @@ export default function NoteItem({ note, onDelete, onUpdate }: NoteItemProps) {
     });
   };
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(note.content);
+      setIsCopied(true);
+      toast({
+        title: 'Copied!',
+        description: 'Note content has been copied to your clipboard.',
+      });
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: 'Failed to copy note content.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const getStatusIndicator = () => {
     switch (saveStatus) {
       case 'saving':
@@ -122,10 +142,16 @@ export default function NoteItem({ note, onDelete, onUpdate }: NoteItemProps) {
                 Save &amp; Close
             </Button>
           ) : (
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
-              <Pencil className="h-4 w-4" />
-              <span className="sr-only">Edit</span>
-            </Button>
+            <>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleCopy}>
+                {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                <span className="sr-only">Copy content</span>
+              </Button>
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)}>
+                <Pencil className="h-4 w-4" />
+                <span className="sr-only">Edit</span>
+              </Button>
+            </>
           )}
 
           <AlertDialog>
