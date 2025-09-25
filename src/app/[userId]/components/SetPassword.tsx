@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { KeyRound, Loader2 } from 'lucide-react';
 import { setPasswordAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,7 @@ function SubmitButton() {
 }
 
 export default function SetPassword({ userId }: SetPasswordProps) {
-    const [state, formAction] = useFormState(setPasswordAction, { message: '', ok: false });
+    const [state, formAction] = useActionState(setPasswordAction, { message: '', ok: false });
     const { toast } = useToast();
 
     useEffect(() => {

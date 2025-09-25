@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { LogIn, Loader2 } from 'lucide-react';
 import { verifyPasswordAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
@@ -27,7 +28,7 @@ function SubmitButton() {
 }
 
 export default function PasswordProtect({ userId }: PasswordProtectProps) {
-    const [state, formAction] = useFormState(verifyPasswordAction, { message: '' });
+    const [state, formAction] = useActionState(verifyPasswordAction, { message: '' });
 
     return (
         <Card>
