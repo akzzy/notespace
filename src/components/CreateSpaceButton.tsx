@@ -11,8 +11,8 @@ export function CreateSpaceButton() {
 
   const handleClick = () => {
     setIsLoading(true);
-    // Generate a 6-digit unique User ID
-    const userId = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate a 4-character alphanumeric ID
+    const userId = Math.random().toString(36).substring(2, 6);
     router.push(`/${userId}`);
   };
 
