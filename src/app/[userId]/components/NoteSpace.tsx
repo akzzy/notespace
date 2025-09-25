@@ -51,8 +51,16 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
   });
   
   const handleTextareaInput = (el: HTMLTextAreaElement) => {
+    const maxScreenHeight = window.innerHeight * 0.75;
     el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
+    const newHeight = Math.min(el.scrollHeight, maxScreenHeight);
+    el.style.height = `${newHeight}px`;
+
+    if (el.scrollHeight > maxScreenHeight) {
+      el.style.overflowY = 'auto';
+    } else {
+      el.style.overflowY = 'hidden';
+    }
   };
 
   const onSubmit: SubmitHandler<NoteFormData> = (data) => {
@@ -75,6 +83,7 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
         
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.overflowY = 'hidden';
         }
 
         const result = await addNoteAction({ message: '' }, formData);
