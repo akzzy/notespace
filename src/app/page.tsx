@@ -3,8 +3,8 @@ import { Icons } from '@/components/Icons';
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="container z-40 bg-background">
+    <div className="flex flex-col min-h-screen bg-background">
+      <header className="container z-40">
         <div className="flex h-20 items-center justify-between py-6">
           <div className="flex gap-6 md:gap-10">
             <a href="/" className="flex items-center space-x-2">
