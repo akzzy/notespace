@@ -5,7 +5,7 @@ import * as db from './db';
 import { z } from 'zod';
 
 const NoteSchema = z.object({
-  content: z.string().min(1).max(2000),
+  content: z.string().min(1).max(1000),
   userId: z.string(),
 });
 
