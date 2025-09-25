@@ -11,8 +11,8 @@ export function CreateSpaceButton() {
 
   const handleClick = () => {
     setIsLoading(true);
-    // Generate a 4-character alphanumeric ID
-    const userId = Math.random().toString(36).substring(2, 6);
+    // Generate a 4-character alphanumeric ID in uppercase
+    const userId = Math.random().toString(36).substring(2, 6).toUpperCase();
     router.push(`/${userId}`);
   };
 

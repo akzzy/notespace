@@ -12,7 +12,7 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
   const { userId } = params;
 
   // Basic validation for user ID format
-  if (!/^[a-z0-9]{4}$/.test(userId)) {
+  if (!/^[A-Z0-9]{4}$/.test(userId)) {
     notFound();
   }
 
