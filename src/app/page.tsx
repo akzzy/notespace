@@ -4,7 +4,7 @@ import { Icons } from '@/components/Icons';
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="container z-40">
+      <header className="container mx-auto z-40">
         <div className="flex h-20 items-center justify-between py-6">
           <div className="flex gap-6 md:gap-10">
             <a href="/" className="flex items-center space-x-2">
@@ -15,7 +15,7 @@ export default function Home() {
         </div>
       </header>
       <main className="flex-1">
-        <div className="container relative flex flex-col items-center justify-center gap-4 py-20 text-center md:py-32">
+        <div className="container mx-auto relative flex flex-col items-center justify-center gap-4 py-20 text-center md:py-32">
           <div className="absolute top-0 -z-10 h-full w-full bg-white dark:bg-background">
             <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-[rgba(0,150,136,0.2)] opacity-50 blur-[80px]"></div>
           </div>
