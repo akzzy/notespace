@@ -20,6 +20,10 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
 
   return (
     <div className="container mx-auto max-w-3xl py-8">
+       <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Note Space</h1>
+        <p className="text-lg text-muted-foreground font-mono tracking-widest mt-1">{userId}</p>
+      </div>
       <NoteSpace userId={userId} initialNotes={initialNotes} />
     </div>
   );
