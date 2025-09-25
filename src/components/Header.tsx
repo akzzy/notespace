@@ -18,7 +18,7 @@ export function Header({ noteSpaceId }: HeaderProps) {
           {noteSpaceId && (
             <div className="hidden items-center gap-2 md:flex">
                 <span className="text-sm text-muted-foreground">/</span>
-                <span className="font-mono text-sm font-medium tracking-widest text-foreground">
+                <span className="font-mono text-xl font-bold tracking-widest text-foreground">
                     {noteSpaceId}
                 </span>
             </div>
