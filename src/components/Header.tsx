@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Icons } from '@/components/Icons';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { CopyButton } from '@/components/CopyButton';
 
 type HeaderProps = {
   noteSpaceId?: string;
@@ -17,10 +18,11 @@ export function Header({ noteSpaceId }: HeaderProps) {
           </Link>
           {noteSpaceId && (
             <div className="hidden items-center gap-2 md:flex">
-                <span className="text-sm text-muted-foreground">/</span>
-                <span className="font-mono text-xl font-bold tracking-widest text-foreground">
-                    {noteSpaceId}
-                </span>
+              <span className="text-sm text-muted-foreground">/</span>
+              <span className="font-mono text-xl font-bold tracking-widest text-foreground">
+                {noteSpaceId}
+              </span>
+              <CopyButton textToCopy={noteSpaceId} />
             </div>
           )}
         </div>
