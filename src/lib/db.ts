@@ -22,6 +22,7 @@ const notesStore: Record<string, Note[]> = {
 };
 
 const passwordStore: Record<string, string> = {}; // userId -> hashedPassword
+const ipStore: Record<string, string> = { "123456": "::1" }; // userId -> ip address
 
 // Simulate network latency
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -44,10 +45,13 @@ export async function getNotes(userId: string): Promise<Note[]> {
   return userNotes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
-export async function addNote(userId: string, content: string): Promise<Note> {
+export async function addNote(userId: string, content: string, ip?: string): Promise<Note> {
   await delay(300);
   if (!notesStore[userId]) {
     notesStore[userId] = [];
+  }
+  if (ip) {
+    ipStore[userId] = ip;
   }
   const newNote: Note = {
     id: crypto.randomUUID(),
@@ -60,13 +64,17 @@ export async function addNote(userId: string, content: string): Promise<Note> {
   return newNote;
 }
 
-export async function updateNote(userId: string, noteId: string, content: string): Promise<Note | null> {
+export async function updateNote(userId: string, noteId: string, content: string, ip?: string): Promise<Note | null> {
   await delay(300);
   const userNotes = notesStore[userId];
   if (!userNotes) return null;
 
   const noteIndex = userNotes.findIndex(note => note.id === noteId);
   if (noteIndex === -1) return null;
+  
+  if (ip) {
+    ipStore[userId] = ip;
+  }
 
   const updatedNote = {
     ...userNotes[noteIndex],
@@ -111,4 +119,12 @@ export async function checkPassword(userId: string, password: string): Promise<b
     const hash = await getPasswordHash(userId);
     if (!hash) return false; // Should not happen if this function is called correctly
     return verifyPassword(password, hash);
+}
+
+export async function getNoteSpacesByIp(ip: string): Promise<string[]> {
+    await delay(100);
+    const userIds = Object.entries(ipStore)
+        .filter(([, storedIp]) => storedIp === ip)
+        .map(([userId]) => userId);
+    return userIds;
 }

@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import * as db from './db';
 import { z } from 'zod';
 
@@ -24,10 +24,12 @@ export async function addNoteAction(
   }
   
   const { userId, content } = validatedFields.data;
+  const ip = headers().get('x-forwarded-for') ?? '::1';
 
   try {
-    await db.addNote(userId, content);
+    await db.addNote(userId, content, ip);
     revalidatePath(`/${userId}`);
+    revalidatePath(`/`);
     return { message: 'Added note.' };
   } catch (e) {
     return { message: 'Failed to create note.' };
@@ -35,10 +37,12 @@ export async function addNoteAction(
 }
 
 export async function updateNoteAction(userId: string, noteId: string, content: string) {
+    const ip = headers().get('x-forwarded-for') ?? '::1';
     try {
-        const result = await db.updateNote(userId, noteId, content);
+        const result = await db.updateNote(userId, noteId, content, ip);
         if(result) {
             revalidatePath(`/${userId}`);
+            revalidatePath(`/`);
             return { ok: true, message: 'Note updated.' };
         }
         return { ok: false, message: 'Failed to find note to update.' };

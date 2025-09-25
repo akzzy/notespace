@@ -1,9 +1,15 @@
 import { CreateSpaceButton } from '@/components/CreateSpaceButton';
 import { JoinSpaceForm } from '@/components/JoinSpaceForm';
 import { Icons } from '@/components/Icons';
-import { Separator } from '@/components/ui/separator';
+import { getNoteSpacesByIp } from '@/lib/db';
+import { headers } from 'next/headers';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
-export default function Home() {
+export default async function Home() {
+  const ip = headers().get('x-forwarded-for') ?? '::1';
+  const recentSpaces = await getNoteSpacesByIp(ip);
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <header className="container mx-auto z-40">
@@ -46,6 +52,22 @@ export default function Home() {
           <div className="mt-6 w-full max-w-sm">
             <JoinSpaceForm />
           </div>
+
+          {recentSpaces.length > 0 && (
+            <div className="mt-16 w-full max-w-sm">
+                <h2 className="text-lg font-semibold text-muted-foreground mb-4">Recently Visited</h2>
+                <div className="flex flex-col gap-2">
+                    {recentSpaces.map(spaceId => (
+                        <Link href={`/${spaceId}`} key={spaceId} legacyBehavior>
+                            <Button variant="outline" className="w-full justify-center font-mono text-lg tracking-widest h-11">
+                                {spaceId}
+                            </Button>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+          )}
+
         </div>
       </main>
     </div>
