@@ -19,7 +19,7 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
   const initialNotes = await getNotes(userId);
 
   return (
-    <div className="container max-w-3xl py-8">
+    <div className="container mx-auto max-w-3xl py-8">
       <NoteSpace userId={userId} initialNotes={initialNotes} />
     </div>
   );
