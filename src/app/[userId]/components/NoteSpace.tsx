@@ -41,6 +41,7 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const form = useForm<NoteFormData>({
     resolver: zodResolver(NoteSchema),
@@ -48,6 +49,11 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
       content: '',
     },
   });
+  
+  const handleTextareaInput = (el: HTMLTextAreaElement) => {
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  };
 
   const onSubmit: SubmitHandler<NoteFormData> = (data) => {
     const formData = new FormData();
@@ -66,6 +72,10 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
         };
         setNotes(prev => [newNote, ...prev]);
         form.reset();
+        
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+        }
 
         const result = await addNoteAction({ message: '' }, formData);
         
@@ -107,9 +117,14 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
                   <FormItem>
                     <FormControl>
                       <Textarea
+                        ref={textareaRef}
                         placeholder="Type your new note here..."
-                        className="resize-none border-0 shadow-none focus-visible:ring-0"
+                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden"
                         {...field}
+                        onInput={(e) => {
+                            field.onChange(e);
+                            handleTextareaInput(e.currentTarget);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
