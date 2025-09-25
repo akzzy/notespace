@@ -78,7 +78,7 @@ export default function NoteItem({ note, onDelete, onUpdate }: NoteItemProps) {
     if (isEditing && debouncedContent !== note.content) {
       handleUpdate();
     }
-  }, [debouncedContent]);
+  }, [debouncedContent, isEditing, note.content]);
 
   const handleDelete = () => {
     startDeleteTransition(async () => {
@@ -102,7 +102,8 @@ export default function NoteItem({ note, onDelete, onUpdate }: NoteItemProps) {
     });
   };
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       await navigator.clipboard.writeText(note.content);
       setIsCopied(true);
@@ -147,18 +148,63 @@ export default function NoteItem({ note, onDelete, onUpdate }: NoteItemProps) {
     setIsDialogOpen(open);
   }
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+    setIsDialogOpen(true);
+  }
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-      <DialogTrigger asChild>
-        <Card className={note.id.startsWith('temp-') ? 'opacity-60 cursor-pointer hover:shadow-lg transition-shadow' : 'cursor-pointer hover:shadow-lg transition-shadow'}>
-          <CardContent className="p-4 whitespace-pre-wrap">
-            <p className="min-h-[24px] max-h-[120px] overflow-hidden text-ellipsis">{note.content}</p>
-          </CardContent>
-          <CardFooter className="flex justify-between items-center p-4 pt-0">
+      <Card className={note.id.startsWith('temp-') ? 'opacity-60' : ''}>
+        <DialogTrigger asChild>
+          <div className="cursor-pointer">
+            <CardContent className="p-4 whitespace-pre-wrap">
+              <p className="min-h-[24px] max-h-[120px] overflow-hidden text-ellipsis">{note.content}</p>
+            </CardContent>
+          </div>
+        </DialogTrigger>
+        <CardFooter className="flex justify-between items-center p-4 pt-0">
             <div>{getStatusIndicator()}</div>
+            <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleCopy}>
+                  {isCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                  <span className="sr-only">Copy content</span>
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleEditClick}>
+                  <Pencil className="h-4 w-4" />
+                  <span className="sr-only">Edit</span>
+                </Button>
+                <AlertDialog onOpenChange={(e) => e && e.stopPropagation()}>
+                <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={(e) => e.stopPropagation()}>
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Delete</span>
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this note.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={handleDelete}
+                        disabled={isDeletePending}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                        {isDeletePending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Delete
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+                </AlertDialog>
+            </div>
           </CardFooter>
-        </Card>
-      </DialogTrigger>
+      </Card>
       <DialogContent className="sm:max-w-[600px] h-[70vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="pr-20">Note</DialogTitle>
