@@ -37,9 +37,8 @@ export async function addNoteAction(
 }
 
 export async function updateNoteAction(userId: string, noteId: string, content: string) {
-    const ip = headers().get('x-forwarded-for') ?? '::1';
     try {
-        const result = await db.updateNote(userId, noteId, content, ip);
+        const result = await db.updateNote(userId, noteId, content);
         if(result) {
             revalidatePath(`/${userId}`);
             revalidatePath(`/`);

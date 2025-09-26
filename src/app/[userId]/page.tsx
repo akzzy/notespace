@@ -1,7 +1,7 @@
-import { getNotes, getPasswordHash, getDiscoverableByIp } from '@/lib/db';
+import { getNotes, getPasswordHash, getDiscoverableByIp, getCreatorIp } from '@/lib/db';
 import NoteSpace from './components/NoteSpace';
 import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import PasswordProtect from './components/PasswordProtect';
 import Settings from './components/Settings';
 
@@ -18,6 +18,9 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
   if (!/^[A-Z0-9]{4}$/.test(userId)) {
     notFound();
   }
+  
+  const headersList = headers();
+  const visitorIp = headersList.get('x-forwarded-for') ?? '::1';
 
   const passwordHash = await getPasswordHash(userId);
   const cookieStore = cookies();
@@ -33,9 +36,14 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
 
   const initialNotes = await getNotes(userId);
   const isDiscoverable = await getDiscoverableByIp(userId);
+  const creatorIp = await getCreatorIp(userId);
 
-  // Show set password form if no password is set and there's at least one note
-  const showSetPassword = !passwordHash && initialNotes.length > 0;
+  // The "Set Password" form should only show if:
+  // 1. No password is set
+  // 2. There's at least one note
+  // 3. The current visitor is the creator (IP match)
+  const isCreator = creatorIp === visitorIp;
+  const showSetPassword = !passwordHash && initialNotes.length > 0 && isCreator;
   
   // Show settings if the user is authenticated (or no password is set) and there are notes
   const showSettings = (!passwordHash || isAuthenticated) && initialNotes.length > 0;

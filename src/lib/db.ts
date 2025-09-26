@@ -49,14 +49,17 @@ export async function addNote(userId: string, content: string, ip?: string): Pro
   const userDocRef = doc(db, "users", userId);
   const userDocSnap = await getDoc(userDocRef);
 
+  // Only store the IP if it's the very first note, to identify the creator.
   if (!userDocSnap.exists() && ip) {
       await setDoc(userDocRef, { 
-          ip: ip,
+          creatorIp: ip, // Use a specific field for the creator's IP
           isDiscoverable: false,
           createdAt: serverTimestamp()
       });
-  } else if (ip) {
-      await updateDoc(userDocRef, { ip: ip });
+  } else if (ip && userDocSnap.exists() && userDocSnap.data()?.creatorIp === ip) {
+      // If the same user adds more notes, we can update other info if needed,
+      // but we don't need to update the creatorIp.
+      // For now, let's just make sure we don't overwrite it.
   }
 
   const notesCol = collection(db, `users/${userId}/notes`);
@@ -81,11 +84,6 @@ export async function updateNote(userId: string, noteId: string, content: string
   const noteSnap = await getDoc(noteRef);
 
   if (!noteSnap.exists()) return null;
-
-  if (ip) {
-    const userDocRef = doc(db, "users", userId);
-    await updateDoc(userDocRef, { ip: ip });
-  }
 
   await updateDoc(noteRef, {
     content: content,
@@ -124,7 +122,7 @@ export async function setPassword(userId: string, password: string): Promise<boo
         });
         return true;
     } catch (e) {
-        // If the doc doesn't exist, create it
+        // This case should ideally not be hit if we only allow setting password after a note is created.
         await setDoc(userDocRef, {
             passwordHash: hashPassword(password),
             createdAt: serverTimestamp()
@@ -143,6 +141,16 @@ export async function getPasswordHash(userId: string): Promise<string | null> {
     return null;
 }
 
+export async function getCreatorIp(userId: string): Promise<string | null> {
+    await delay(50);
+    const userDocRef = doc(db, "users", userId);
+    const docSnap = await getDoc(userDocRef);
+    if (docSnap.exists()) {
+        return docSnap.data().creatorIp || null;
+    }
+    return null;
+}
+
 export async function checkPassword(userId: string, password: string): Promise<boolean> {
     await delay(200);
     const hash = await getPasswordHash(userId);
@@ -153,7 +161,7 @@ export async function checkPassword(userId: string, password: string): Promise<b
 export async function getNoteSpacesByIp(ip: string): Promise<string[]> {
     await delay(100);
     const usersCol = collection(db, "users");
-    const q = query(usersCol, where("ip", "==", ip), where("isDiscoverable", "==", true));
+    const q = query(usersCol, where("creatorIp", "==", ip), where("isDiscoverable", "==", true));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => doc.id);
 }
