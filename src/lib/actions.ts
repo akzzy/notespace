@@ -132,3 +132,30 @@ export async function verifyPasswordAction(prevState: { message: string }, formD
         return { message: "Incorrect password." };
     }
 }
+
+const DiscoverabilitySchema = z.object({
+    userId: z.string().length(4),
+    isDiscoverable: z.boolean(),
+});
+
+export async function setDiscoverabilityAction(prevState: { message: string, ok: boolean }, formData: FormData) {
+    const isDiscoverable = formData.get('isDiscoverable') === 'true';
+    const validatedFields = DiscoverabilitySchema.safeParse({
+        userId: formData.get('userId'),
+        isDiscoverable: isDiscoverable
+    });
+    
+    if (!validatedFields.success) {
+        return { message: "Invalid data.", ok: false };
+    }
+
+    const { userId } = validatedFields.data;
+
+    try {
+        await db.setDiscoverableByIp(userId, isDiscoverable);
+        revalidatePath(`/`); // Revalidate home page
+        return { message: `Discoverability ${isDiscoverable ? 'enabled' : 'disabled'}.`, ok: true };
+    } catch (e) {
+        return { message: 'Failed to update setting.', ok: false };
+    }
+}

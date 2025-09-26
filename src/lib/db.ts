@@ -23,6 +23,7 @@ const notesStore: Record<string, Note[]> = {
 
 const passwordStore: Record<string, string> = {}; // userId -> hashedPassword
 const ipStore: Record<string, string> = { "123456": "::1" }; // userId -> ip address
+const discoverabilityStore: Record<string, boolean> = { "123456": true }; // userId -> isDiscoverableByIp
 
 // Simulate network latency
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -49,6 +50,7 @@ export async function addNote(userId: string, content: string, ip?: string): Pro
   await delay(300);
   if (!notesStore[userId]) {
     notesStore[userId] = [];
+    discoverabilityStore[userId] = false; // Default to not discoverable
   }
   if (ip) {
     ipStore[userId] = ip;
@@ -125,6 +127,21 @@ export async function getNoteSpacesByIp(ip: string): Promise<string[]> {
     await delay(100);
     const userIds = Object.entries(ipStore)
         .filter(([, storedIp]) => storedIp === ip)
-        .map(([userId]) => userId);
+        .map(([userId]) => userId)
+        .filter(userId => discoverabilityStore[userId]); // Only return discoverable spaces
     return userIds;
+}
+
+export async function setDiscoverableByIp(userId: string, isDiscoverable: boolean): Promise<boolean> {
+    await delay(100);
+    if (notesStore[userId]) {
+        discoverabilityStore[userId] = isDiscoverable;
+        return true;
+    }
+    return false;
+}
+
+export async function getDiscoverableByIp(userId: string): Promise<boolean> {
+    await delay(50);
+    return discoverabilityStore[userId] ?? false;
 }
