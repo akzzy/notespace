@@ -1,20 +1,21 @@
 'use client';
 
-import { useTransition, useOptimistic, useRef, useEffect, useState } from 'react';
+import { useTransition, useOptimistic, useRef } from 'react';
 import { setDiscoverabilityAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
-
+import SetPassword from './SetPassword';
 
 interface SettingsProps {
     userId: string;
     isDiscoverable: boolean;
+    showSetPassword?: boolean;
 }
 
-export default function Settings({ userId, isDiscoverable }: SettingsProps) {
+export default function Settings({ userId, isDiscoverable, showSetPassword = false }: SettingsProps) {
     const { toast } = useToast();
     const formRef = useRef<HTMLFormElement>(null);
     const [isPending, startTransition] = useTransition();
@@ -46,16 +47,15 @@ export default function Settings({ userId, isDiscoverable }: SettingsProps) {
         <Card className="mb-6">
             <CardHeader>
                 <CardTitle>Settings</CardTitle>
-                <CardDescription>Manage your NoteSpace settings.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
                 <form ref={formRef} className="space-y-4">
-                     <input type="hidden" name="userId" value={userId} />
-                    <div className="flex items-center justify-between space-x-2 rounded-lg border p-4">
+                    <input type="hidden" name="userId" value={userId} />
+                    <div className="flex items-center justify-between space-x-2 p-4">
                         <div className='space-y-0.5 pr-4'>
-                            <Label htmlFor="discoverable-switch" className="text-base">Discoverable by IP</Label>
-                             <p className="text-sm text-muted-foreground">
-                                Allow this NoteSpace to appear on the homepage for anyone on your network.
+                            <Label htmlFor="discoverable-switch" className="font-medium">Discoverable by IP</Label>
+                             <p className="text-xs text-muted-foreground">
+                                Allow this NoteSpace to appear on the homepage for others on your network.
                             </p>
                         </div>
                          <div className='flex items-center gap-2'>
@@ -71,6 +71,7 @@ export default function Settings({ userId, isDiscoverable }: SettingsProps) {
                         </div>
                     </div>
                 </form>
+                {showSetPassword && <SetPassword userId={userId} />}
             </CardContent>
         </Card>
     );

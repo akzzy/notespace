@@ -3,7 +3,6 @@ import NoteSpace from './components/NoteSpace';
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
 import PasswordProtect from './components/PasswordProtect';
-import SetPassword from './components/SetPassword';
 import Settings from './components/Settings';
 
 interface NoteSpacePageProps {
@@ -43,8 +42,7 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
-      {showSetPassword && <SetPassword userId={userId} />}
-      {showSettings && <Settings userId={userId} isDiscoverable={isDiscoverable} />}
+      {showSettings && <Settings userId={userId} isDiscoverable={isDiscoverable} showSetPassword={showSetPassword} />}
       <NoteSpace userId={userId} initialNotes={initialNotes} />
     </div>
   );
