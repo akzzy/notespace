@@ -20,6 +20,17 @@ const CreateNoteSchema = z.object({
 
 type CreateNoteFormData = z.infer<typeof CreateNoteSchema>;
 
+const generateUserId = () => {
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
+  const part1 = letters.charAt(Math.floor(Math.random() * letters.length));
+  const part2 = letters.charAt(Math.floor(Math.random() * letters.length));
+  const part3 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+  const part4 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+  return `${part1}${part2}${part3}${part4}`;
+}
+
+
 export function CreateNoteForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
@@ -49,7 +60,7 @@ export function CreateNoteForm() {
   };
 
   const onSubmit: SubmitHandler<CreateNoteFormData> = (data) => {
-    const userId = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const userId = generateUserId();
     const formData = new FormData();
     formData.append('content', data.content);
     formData.append('userId', userId);
@@ -90,14 +101,19 @@ export function CreateNoteForm() {
                               sequence={[
                                 'I should build an AI tutor for kids...',
                                 2000,
-                                'I should...',
-                                1000,
-                                'I should build an AI tutor for kids...',
-                                5000,
+                                'My shopping list: milk, bread, and eggs.',
+                                2000,
+                                'A great idea for a new app...',
+                                2000,
+                                'Finish the presentation for tomorrow\'s meeting.',
+                                2000,
+                                'Remember to call Mom back.',
+                                2000,
                               ]}
                               wrapper="span"
                               cursor={true}
                               repeat={Infinity}
+                              style={{ verticalAlign: 'middle', height: '24px', display: 'inline-block' }}
                             />
                           </div>
                         )}

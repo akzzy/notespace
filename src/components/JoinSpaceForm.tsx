@@ -22,8 +22,8 @@ const JoinSpaceSchema = z.object({
   userId: z
     .string()
     .length(4, { message: 'Code must be exactly 4 characters.' })
-    .regex(/^[A-Z0-9]{4}$/, {
-      message: 'Code must be 4 uppercase letters or numbers.',
+    .regex(/^[A-Z]{2}[0-9]{2}$/, {
+      message: 'Code must be 2 letters followed by 2 numbers.',
     })
     .transform((val) => val.toUpperCase()),
 });
@@ -63,7 +63,7 @@ export function JoinSpaceForm() {
                 <FormItem className="flex-1">
                   <FormControl>
                     <Input
-                      placeholder="e.g. 1A2B"
+                      placeholder="e.g. AB12"
                       autoComplete="off"
                       {...field}
                       onChange={(e) => field.onChange(e.target.value.toUpperCase())}

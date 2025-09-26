@@ -15,8 +15,8 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
   const { userId } = params;
   const cookieStore = cookies();
 
-  // Basic validation for user ID format
-  if (!/^[A-Z0-9]{4}$/.test(userId)) {
+  // Validation for new user ID format (e.g., AB12)
+  if (!/^[A-Z]{2}[0-9]{2}$/.test(userId)) {
     notFound();
   }
   
