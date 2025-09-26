@@ -23,7 +23,7 @@ export default async function NoteSpaceLayout({
   const creatorTokenFromDb = await getCreatorToken(userId);
   const isCreator = !!creatorTokenFromCookie && creatorTokenFromCookie === creatorTokenFromDb;
 
-  // The "Set Password" form should only show if:
+  // The "Set Password" option should only show if:
   // 1. No password is set.
   // 2. There's at least one note.
   // 3. The current visitor is the creator (verified by token).

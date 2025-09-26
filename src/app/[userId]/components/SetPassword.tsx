@@ -21,6 +21,8 @@ import {
 
 interface SetPasswordProps {
     userId: string;
+    onPasswordSet?: () => void;
+    renderAsButton?: boolean;
 }
 
 function SubmitButton() {
@@ -37,7 +39,7 @@ function SubmitButton() {
     );
 }
 
-export default function SetPassword({ userId }: SetPasswordProps) {
+export default function SetPassword({ userId, onPasswordSet, renderAsButton = false }: SetPasswordProps) {
     const [state, formAction] = useActionState(setPasswordAction, { message: '', ok: false });
     const { toast } = useToast();
     const [isOpen, setIsOpen] = useState(false);
@@ -51,22 +53,32 @@ export default function SetPassword({ userId }: SetPasswordProps) {
             });
             if (state.ok) {
                 setIsOpen(false);
+                onPasswordSet?.();
             }
         }
-    }, [state, toast]);
+    }, [state, toast, onPasswordSet]);
     
-    // Don't render the button if the password was just set successfully
+    // Don't render anything if the password was just set successfully from within this component instance
     if (state.ok) {
         return null;
     }
 
+    const trigger = renderAsButton ? (
+        <Button>
+            <KeyRound className="mr-2 h-4 w-4" />
+            Set a Password
+        </Button>
+    ) : (
+        <Button variant="outline" className="w-full justify-start">
+           <KeyRound className="mr-2 h-4 w-4" />
+           Set a Password
+       </Button>
+    );
+
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                 <Button variant="outline" className="w-full justify-start">
-                    <KeyRound className="mr-2 h-4 w-4" />
-                    Set a Password
-                </Button>
+                {trigger}
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
