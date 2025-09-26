@@ -82,12 +82,12 @@ export function CreateNoteForm() {
                   <FormControl>
                     <div className="relative">
                       {isFormEmpty && (
-                          <div className="absolute top-4 left-4 text-lg text-muted-foreground pointer-events-none">
+                          <div className="absolute top-4 left-4 text-base text-muted-foreground pointer-events-none">
                             <TypeAnimation
                               sequence={[
                                 'I want to build an AI tutor for kids...',
                                 2000,
-                                'I want to build an AI...',
+                                'I want to...',
                                 1000,
                                 'I want to build an AI tutor for kids...',
                                 5000,
@@ -101,7 +101,7 @@ export function CreateNoteForm() {
                       <Textarea
                         ref={textareaRef}
                         placeholder=""
-                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[80px] text-lg bg-transparent"
+                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[80px] text-base bg-transparent"
                         {...field}
                         onInput={(e) => {
                           field.onChange(e);
