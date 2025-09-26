@@ -49,7 +49,7 @@ export default function Settings({ userId, isDiscoverable, showSetPassword = fal
                 <CardTitle>Settings</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-                <form ref={formRef} className="space-y-4">
+                <form ref={formRef}>
                     <input type="hidden" name="userId" value={userId} />
                     <div className="flex items-center justify-between space-x-2 p-4">
                         <div className='space-y-0.5 pr-4'>
