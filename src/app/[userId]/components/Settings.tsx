@@ -53,6 +53,14 @@ export default function Settings({ userId, isDiscoverable, showSetPassword = fal
     return (
         <Wrapper>
             <ContentWrapper>
+                {showSetPassword && (
+                    <>
+                        <div className="p-2">
+                            <SetPassword userId={userId} />
+                        </div>
+                        <Separator />
+                    </>
+                )}
                  <div className={cn(isInDropdown ? 'space-y-4' : 'p-4 space-y-4')}>
                     <form ref={formRef}>
                         <input type="hidden" name="userId" value={userId} />
@@ -77,14 +85,6 @@ export default function Settings({ userId, isDiscoverable, showSetPassword = fal
                         </div>
                     </form>
                 </div>
-                {showSetPassword && (
-                    <>
-                        <Separator />
-                        <div className="p-2">
-                            <SetPassword userId={userId} />
-                        </div>
-                    </>
-                )}
             </ContentWrapper>
         </Wrapper>
     );
