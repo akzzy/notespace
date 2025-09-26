@@ -4,16 +4,28 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Rocket } from 'lucide-react';
 import { useState } from 'react';
+import { addNoteAction } from '@/lib/actions';
 
 export function CreateSpaceButton() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     setIsLoading(true);
-    // Generate a 4-character alphanumeric ID in uppercase
     const userId = Math.random().toString(36).substring(2, 6).toUpperCase();
-    router.push(`/${userId}`);
+    
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('content', 'Welcome to your new NoteSpace! ✨');
+    
+    const result = await addNoteAction({ message: '' }, formData);
+
+    if (result.message === 'Added note.') {
+      router.push(`/${userId}`);
+    } else {
+      // Handle error - maybe show a toast
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -1,10 +1,11 @@
-import { CreateSpaceButton } from '@/components/CreateSpaceButton';
 import { JoinSpaceForm } from '@/components/JoinSpaceForm';
 import { Icons } from '@/components/Icons';
 import { getNoteSpacesByIp } from '@/lib/db';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { CreateNoteForm } from '@/components/CreateNoteForm';
+import { Separator } from '@/components/ui/separator';
 
 export default async function Home() {
   const ip = headers().get('x-forwarded-for') ?? '::1';
@@ -21,19 +22,17 @@ export default async function Home() {
         </div>
       </header>
       <main className="flex-1">
-        <div className="container mx-auto relative flex flex-col items-center justify-center gap-4 py-20 text-center md:py-32">
-          <div className="absolute top-0 -z-10 h-full w-full bg-white dark:bg-background">
-            <div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-[rgba(0,150,136,0.2)] opacity-50 blur-[80px]"></div>
-          </div>
-
+        <div className="container mx-auto relative flex flex-col items-center justify-center gap-4 py-12 text-center md:py-20">
+          
           <h1 className="text-4xl font-extrabold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-            Your ideas, anywhere.
+            A space for your thoughts.
           </h1>
           <p className="max-w-[700px] text-lg text-muted-foreground sm:text-xl">
-            A private space for your notes, accessible from any device. Create your unique NoteSpace and start capturing your thoughts instantly.
+            Just start typing and create a private notespace. Instantly.
           </p>
-          <div className="mt-6">
-            <CreateSpaceButton />
+
+          <div className="mt-8 w-full max-w-2xl">
+            <CreateNoteForm />
           </div>
           
           <div className="mt-12 w-full max-w-md">

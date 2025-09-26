@@ -111,7 +111,7 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="shadow-xl">
         <CardContent className="p-4">
           <Form {...form}>
             <form
@@ -128,7 +128,7 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
                       <Textarea
                         ref={textareaRef}
                         placeholder="Type your new note here..."
-                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[120px]"
+                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[120px] bg-transparent text-base"
                         {...field}
                         onInput={(e) => {
                             field.onChange(e);
