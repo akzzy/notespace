@@ -17,7 +17,7 @@ export function Header({ noteSpaceId }: HeaderProps) {
             <span className="font-bold sm:inline-block">NoteSpace</span>
           </Link>
           {noteSpaceId && (
-            <div className="hidden items-center gap-2 md:flex">
+            <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">/</span>
               <span className="font-mono text-xl font-bold tracking-widest text-foreground">
                 {noteSpaceId}
