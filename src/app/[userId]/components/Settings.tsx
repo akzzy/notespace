@@ -3,12 +3,13 @@
 import { useTransition, useOptimistic, useRef } from 'react';
 import { setDiscoverabilityAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import SetPassword from './SetPassword';
 import { cn } from '@/lib/utils';
+import { Separator } from '@/components/ui/separator';
 
 
 interface SettingsProps {
@@ -47,13 +48,12 @@ export default function Settings({ userId, isDiscoverable, showSetPassword = fal
     }
 
     const Wrapper = isInDropdown ? 'div' : Card;
-    const ContentWrapper = isInDropdown ? 'div' : CardContent;
+    const ContentWrapper = isInDropdown ? 'div' : 'div';
 
     return (
-        <Wrapper className={cn(!isInDropdown && "mb-6")}>
-            <ContentWrapper className={cn(!isInDropdown && 'p-0')}>
+        <Wrapper>
+            <ContentWrapper>
                  <div className={cn(isInDropdown ? 'space-y-4' : 'p-4 space-y-4')}>
-                    {!isInDropdown && <h3 className="text-lg font-medium">Settings</h3>}
                     <form ref={formRef}>
                         <input type="hidden" name="userId" value={userId} />
                         <div className="flex items-center justify-between space-x-2">
@@ -77,7 +77,14 @@ export default function Settings({ userId, isDiscoverable, showSetPassword = fal
                         </div>
                     </form>
                 </div>
-                {showSetPassword && <SetPassword userId={userId} />}
+                {showSetPassword && (
+                    <>
+                        <Separator />
+                        <div className="p-2">
+                            <SetPassword userId={userId} />
+                        </div>
+                    </>
+                )}
             </ContentWrapper>
         </Wrapper>
     );
