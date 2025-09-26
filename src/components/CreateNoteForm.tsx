@@ -6,6 +6,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Loader2, PlusCircle } from 'lucide-react';
+import { TypeAnimation } from 'react-type-animation';
 import { useToast } from '@/hooks/use-toast';
 import { addNoteAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
@@ -66,6 +67,8 @@ export function CreateNoteForm() {
     });
   };
 
+  const isFormEmpty = !form.watch('content');
+
   return (
     <Card className="shadow-2xl">
       <CardContent className="p-4">
@@ -77,16 +80,35 @@ export function CreateNoteForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Textarea
-                      ref={textareaRef}
-                      placeholder="I want to build an AI tutor for kids..."
-                      className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[80px] text-lg"
-                      {...field}
-                      onInput={(e) => {
-                        field.onChange(e);
-                        handleTextareaInput(e.currentTarget);
-                      }}
-                    />
+                    <div className="relative">
+                      {isFormEmpty && (
+                          <div className="absolute top-4 left-4 text-lg text-muted-foreground pointer-events-none">
+                            <TypeAnimation
+                              sequence={[
+                                'I want to build an AI tutor for kids...',
+                                2000,
+                                'I want to build an AI...',
+                                1000,
+                                'I want to build an AI tutor for kids...',
+                                5000,
+                              ]}
+                              wrapper="span"
+                              cursor={true}
+                              repeat={Infinity}
+                            />
+                          </div>
+                        )}
+                      <Textarea
+                        ref={textareaRef}
+                        placeholder=""
+                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[80px] text-lg bg-transparent"
+                        {...field}
+                        onInput={(e) => {
+                          field.onChange(e);
+                          handleTextareaInput(e.currentTarget);
+                        }}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
