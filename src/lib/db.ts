@@ -43,23 +43,24 @@ export async function getNotes(userId: string): Promise<Note[]> {
   return notesList;
 }
 
-export async function addNote(userId: string, content: string, ip?: string): Promise<Note> {
+export async function addNote(userId: string, content: string, ip?: string): Promise<Note & { creatorToken?: string }> {
   await delay(300);
   
   const userDocRef = doc(db, "users", userId);
   const userDocSnap = await getDoc(userDocRef);
+  let creatorToken: string | undefined = undefined;
 
-  // Only store the IP if it's the very first note, to identify the creator.
-  if (!userDocSnap.exists() && ip) {
-      await setDoc(userDocRef, { 
-          creatorIp: ip, // Use a specific field for the creator's IP
+  if (!userDocSnap.exists()) {
+      creatorToken = crypto.randomBytes(32).toString('hex');
+      const userData: {creatorIp?: string, isDiscoverable: boolean, createdAt: any, creatorToken?: string } = {
           isDiscoverable: false,
-          createdAt: serverTimestamp()
-      });
-  } else if (ip && userDocSnap.exists() && userDocSnap.data()?.creatorIp === ip) {
-      // If the same user adds more notes, we can update other info if needed,
-      // but we don't need to update the creatorIp.
-      // For now, let's just make sure we don't overwrite it.
+          createdAt: serverTimestamp(),
+          creatorToken: creatorToken,
+      };
+      if (ip) {
+          userData.creatorIp = ip;
+      }
+      await setDoc(userDocRef, userData);
   }
 
   const notesCol = collection(db, `users/${userId}/notes`);
@@ -75,6 +76,7 @@ export async function addNote(userId: string, content: string, ip?: string): Pro
     content,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    creatorToken: creatorToken,
   };
 }
 
@@ -117,17 +119,15 @@ export async function setPassword(userId: string, password: string): Promise<boo
     await delay(200);
     const userDocRef = doc(db, "users", userId);
     try {
+        // Remove creator token when password is set
         await updateDoc(userDocRef, {
-            passwordHash: hashPassword(password)
+            passwordHash: hashPassword(password),
+            creatorToken: null, 
         });
         return true;
     } catch (e) {
-        // This case should ideally not be hit if we only allow setting password after a note is created.
-        await setDoc(userDocRef, {
-            passwordHash: hashPassword(password),
-            createdAt: serverTimestamp()
-        });
-        return true;
+        console.error("Failed to set password and clear token", e);
+        return false;
     }
 }
 
@@ -150,6 +150,16 @@ export async function getCreatorIp(userId: string): Promise<string | null> {
     }
     return null;
 }
+
+export async function getCreatorToken(userId: string): Promise<string | null> {
+    await delay(50);
+    const userDocRef = doc(db, 'users', userId);
+    const docSnap = await getDoc(userDocRef);
+    if (docSnap.exists()) {
+      return docSnap.data().creatorToken || null;
+    }
+    return null;
+  }
 
 export async function checkPassword(userId: string, password: string): Promise<boolean> {
     await delay(200);

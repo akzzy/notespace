@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 import { cookies, headers } from 'next/headers';
 import * as db from './db';
 import { z } from 'zod';
+import crypto from 'crypto';
+
 
 const NoteSchema = z.object({
   content: z.string().min(1).max(10000),
@@ -27,7 +29,23 @@ export async function addNoteAction(
   const ip = headers().get('x-forwarded-for') ?? '::1';
 
   try {
-    await db.addNote(userId, content, ip);
+    // Check if this is the first note for this user
+    const isFirstNote = !(await db.getCreatorIp(userId));
+
+    const result = await db.addNote(userId, content, ip);
+
+    // If it's the first note, set the creator token cookie
+    if (isFirstNote && result.creatorToken) {
+        const cookieStore = cookies();
+        cookieStore.set(`notesspace-creator-token-${userId}`, result.creatorToken, {
+            path: '/',
+            maxAge: 60 * 60 * 24 * 365, // 1 year, to allow password setting later
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+        });
+    }
+
     revalidatePath(`/${userId}`);
     revalidatePath(`/`);
     return { message: 'Added note.' };
@@ -80,16 +98,27 @@ export async function setPasswordAction(prevState: { message: string, ok: boolea
 
     const { userId, password } = validatedFields.data;
 
+    // Security check: Only allow password setting if the user is the creator
+    const cookieStore = cookies();
+    const creatorToken = cookieStore.get(`notesspace-creator-token-${userId}`)?.value;
+    const dbToken = await db.getCreatorToken(userId);
+
+    if (!creatorToken || creatorToken !== dbToken) {
+        return { message: "You don't have permission to set a password.", ok: false };
+    }
+
     try {
         await db.setPassword(userId, password);
         // Set auth cookie after setting password
-        const cookieStore = cookies();
         cookieStore.set(`notesspace-auth-${userId}`, 'true', {
             path: '/',
             maxAge: 60 * 60 * 24 * 7, // 1 week
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
         });
+        // Clear the creator token cookie as it's no longer needed
+        cookieStore.delete(`notesspace-creator-token-${userId}`);
+        
         revalidatePath(`/${userId}`);
         return { message: 'Password set successfully!', ok: true };
     } catch (e) {

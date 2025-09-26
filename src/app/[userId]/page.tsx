@@ -1,4 +1,4 @@
-import { getNotes, getPasswordHash, getDiscoverableByIp, getCreatorIp } from '@/lib/db';
+import { getNotes, getPasswordHash, getDiscoverableByIp, getCreatorToken } from '@/lib/db';
 import NoteSpace from './components/NoteSpace';
 import { notFound } from 'next/navigation';
 import { cookies, headers } from 'next/headers';
@@ -13,17 +13,14 @@ interface NoteSpacePageProps {
 
 export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
   const { userId } = params;
+  const cookieStore = cookies();
 
   // Basic validation for user ID format
   if (!/^[A-Z0-9]{4}$/.test(userId)) {
     notFound();
   }
   
-  const headersList = headers();
-  const visitorIp = headersList.get('x-forwarded-for') ?? '::1';
-
   const passwordHash = await getPasswordHash(userId);
-  const cookieStore = cookies();
   const isAuthenticated = cookieStore.get(`notesspace-auth-${userId}`)?.value === 'true';
 
   if (passwordHash && !isAuthenticated) {
@@ -36,13 +33,16 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
 
   const initialNotes = await getNotes(userId);
   const isDiscoverable = await getDiscoverableByIp(userId);
-  const creatorIp = await getCreatorIp(userId);
+
+  // Logic to determine if the current user is the creator
+  const creatorTokenFromCookie = cookieStore.get(`notesspace-creator-token-${userId}`)?.value;
+  const creatorTokenFromDb = await getCreatorToken(userId);
+  const isCreator = !!creatorTokenFromCookie && creatorTokenFromCookie === creatorTokenFromDb;
 
   // The "Set Password" form should only show if:
-  // 1. No password is set
-  // 2. There's at least one note
-  // 3. The current visitor is the creator (IP match)
-  const isCreator = creatorIp === visitorIp;
+  // 1. No password is set.
+  // 2. There's at least one note.
+  // 3. The current visitor is the creator (verified by token).
   const showSetPassword = !passwordHash && initialNotes.length > 0 && isCreator;
   
   // Show settings if the user is authenticated (or no password is set) and there are notes
