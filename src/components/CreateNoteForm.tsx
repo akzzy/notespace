@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useRef } from 'react';
+import { useTransition, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,6 +25,8 @@ export function CreateNoteForm() {
   const { toast } = useToast();
   const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
+
 
   const form = useForm<CreateNoteFormData>({
     resolver: zodResolver(CreateNoteSchema),
@@ -68,6 +70,7 @@ export function CreateNoteForm() {
   };
 
   const isFormEmpty = !form.watch('content');
+  const showAnimation = isFormEmpty && !isFocused;
 
   return (
     <Card className="shadow-2xl">
@@ -81,8 +84,8 @@ export function CreateNoteForm() {
                 <FormItem>
                   <FormControl>
                     <div className="relative">
-                      {isFormEmpty && (
-                          <div className="absolute top-4 left-4 text-base text-muted-foreground pointer-events-none">
+                      {showAnimation && (
+                          <div className="absolute top-3 left-4 text-base text-muted-foreground pointer-events-none">
                             <TypeAnimation
                               sequence={[
                                 'I want to build an AI tutor for kids...',
@@ -101,8 +104,10 @@ export function CreateNoteForm() {
                       <Textarea
                         ref={textareaRef}
                         placeholder=""
-                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[120px] text-base bg-transparent"
+                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[120px] text-base bg-transparent pt-3"
                         {...field}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
                         onInput={(e) => {
                           field.onChange(e);
                           handleTextareaInput(e.currentTarget);
