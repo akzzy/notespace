@@ -128,7 +128,7 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
                       <Textarea
                         ref={textareaRef}
                         placeholder="Type your new note here..."
-                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden"
+                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[120px]"
                         {...field}
                         onInput={(e) => {
                             field.onChange(e);
