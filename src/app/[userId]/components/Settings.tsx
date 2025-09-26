@@ -3,13 +3,12 @@
 import { useTransition, useOptimistic, useRef } from 'react';
 import { setDiscoverabilityAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import SetPassword from './SetPassword';
 import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
 
 
 interface SettingsProps {
@@ -52,16 +51,13 @@ export default function Settings({ userId, isDiscoverable, showSetPassword = fal
 
     return (
         <Wrapper>
-            <ContentWrapper>
+            <ContentWrapper className='space-y-4'>
                 {showSetPassword && (
-                    <>
-                        <div className="p-2">
-                            <SetPassword userId={userId} />
-                        </div>
-                        <Separator />
-                    </>
+                    <div className="px-2">
+                        <SetPassword userId={userId} />
+                    </div>
                 )}
-                 <div className={cn(isInDropdown ? 'space-y-4' : 'p-4 space-y-4')}>
+                 <div className={cn(isInDropdown ? 'px-2' : 'p-4')}>
                     <form ref={formRef}>
                         <input type="hidden" name="userId" value={userId} />
                         <div className="flex items-center justify-between space-x-2">
