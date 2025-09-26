@@ -37,7 +37,7 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
   const creatorTokenFromCookie = cookieStore.get(`notesspace-creator-token-${userId}`)?.value;
   const creatorTokenFromDb = await getCreatorToken(userId);
   const isCreator = !!creatorTokenFromCookie && creatorTokenFromCookie === creatorTokenFromDb;
-  const showSetPasswordCard = !passwordHash && initialNotes.length > 0 && isCreator;
+  const showSetPasswordCard = !passwordHash && initialNotes.length > 0 && initialNotes.length <= 2 && isCreator;
 
 
   return (
