@@ -88,11 +88,11 @@ export function CreateNoteForm() {
                           <div className="absolute top-3 left-4 text-base text-muted-foreground pointer-events-none">
                             <TypeAnimation
                               sequence={[
-                                'I want to build an AI tutor for kids...',
+                                'I should build an AI tutor for kids...',
                                 2000,
-                                'I want to...',
+                                'I should...',
                                 1000,
-                                'I want to build an AI tutor for kids...',
+                                'I should build an AI tutor for kids...',
                                 5000,
                               ]}
                               wrapper="span"
