@@ -4,7 +4,11 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Toaster } from '@/components/ui/toaster';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({ 
+  subsets: ['latin'], 
+  variable: '--font-inter',
+  weight: ['400', '700', '800'],
+});
 
 export const metadata: Metadata = {
   title: 'NoteSpace - Your Personal Notes',
