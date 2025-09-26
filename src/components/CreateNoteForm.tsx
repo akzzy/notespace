@@ -80,7 +80,7 @@ export function CreateNoteForm() {
                     <Textarea
                       ref={textareaRef}
                       placeholder="I want to build an AI tutor for kids..."
-                      className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[120px] text-lg"
+                      className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[80px] text-lg"
                       {...field}
                       onInput={(e) => {
                         field.onChange(e);

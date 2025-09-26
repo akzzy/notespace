@@ -31,7 +31,7 @@ export default async function Home() {
             Just start typing and create a private notespace. Instantly.
           </p>
 
-          <div className="mt-8 w-full max-w-2xl">
+          <div className="mt-8 w-full max-w-3xl">
             <CreateNoteForm />
           </div>
           
