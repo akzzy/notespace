@@ -68,27 +68,28 @@ export default function NoteSpace({ userId, initialNotes }: NoteSpaceProps) {
     formData.append('content', data.content);
     formData.append('userId', userId);
     
+    const tempId = `temp-${Date.now()}`;
+    const newNote: Note = {
+        id: tempId,
+        userId,
+        content: data.content,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    };
+    setNotes(prev => [newNote, ...prev]);
+    form.reset();
+    
+    if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+        textareaRef.current.style.overflowY = 'hidden';
+    }
+    
     startTransition(async () => {
-        // Optimistic update
-        const tempId = `temp-${Date.now()}`;
-        const newNote: Note = {
-            id: tempId,
-            userId,
-            content: data.content,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
-        setNotes(prev => [newNote, ...prev]);
-        form.reset();
-        
-        if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto';
-            textareaRef.current.style.overflowY = 'hidden';
-        }
-
         const result = await addNoteAction({ message: '' }, formData);
         
-        if (result?.message !== 'Added note.') {
+        if (result?.note) {
+             setNotes(prev => prev.map(n => n.id === tempId ? result.note! : n));
+        } else {
             toast({
                 title: 'Error',
                 description: 'Failed to save note. Please try again.',

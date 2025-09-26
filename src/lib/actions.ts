@@ -5,6 +5,7 @@ import { cookies, headers } from 'next/headers';
 import * as db from './db';
 import { z } from 'zod';
 import crypto from 'crypto';
+import type { Note } from './types';
 
 
 const NoteSchema = z.object({
@@ -13,7 +14,7 @@ const NoteSchema = z.object({
 });
 
 export async function addNoteAction(
-  prevState: { message: string },
+  prevState: { message: string, note?: Note },
   formData: FormData
 ) {
   const validatedFields = NoteSchema.safeParse({
@@ -32,12 +33,12 @@ export async function addNoteAction(
     // Check if this is the first note for this user
     const isFirstNote = !(await db.getCreatorIp(userId));
 
-    const result = await db.addNote(userId, content, ip);
+    const newNote = await db.addNote(userId, content, ip);
 
     // If it's the first note, set the creator token cookie
-    if (isFirstNote && result.creatorToken) {
+    if (isFirstNote && newNote.creatorToken) {
         const cookieStore = cookies();
-        cookieStore.set(`notesspace-creator-token-${userId}`, result.creatorToken, {
+        cookieStore.set(`notesspace-creator-token-${userId}`, newNote.creatorToken, {
             path: '/',
             maxAge: 60 * 60 * 24 * 365, // 1 year, to allow password setting later
             httpOnly: true,
@@ -48,7 +49,7 @@ export async function addNoteAction(
 
     revalidatePath(`/${userId}`);
     revalidatePath(`/`);
-    return { message: 'Added note.' };
+    return { message: 'Added note.', note: newNote };
   } catch (e) {
     return { message: 'Failed to create note.' };
   }
