@@ -1,29 +1,7 @@
+import { db } from './firebase';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, orderBy, limit, serverTimestamp, getDoc, setDoc } from "firebase/firestore";
 import type { Note } from './types';
 import crypto from 'crypto';
-
-// In-memory store to simulate a database
-const notesStore: Record<string, Note[]> = {
-    "123456": [
-        {
-            id: crypto.randomUUID(),
-            userId: "123456",
-            content: "Welcome to your new NoteSpace! ✨\n\n- You can edit this note.\n- You can delete this note.\n- Create new notes using the form above.",
-            createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-            updatedAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-        },
-        {
-            id: crypto.randomUUID(),
-            userId: "123456",
-            content: "This is a second note to demonstrate the list view.",
-            createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-            updatedAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
-        }
-    ]
-};
-
-const passwordStore: Record<string, string> = {}; // userId -> hashedPassword
-const ipStore: Record<string, string> = { "123456": "::1" }; // userId -> ip address
-const discoverabilityStore: Record<string, boolean> = { "123456": true }; // userId -> isDiscoverableByIp
 
 // Simulate network latency
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
@@ -35,113 +13,170 @@ const hashPassword = (password: string) => {
 }
 
 const verifyPassword = (password: string, storedHash: string) => {
-    const [salt, hash] = storedHash.split(':');
-    const hashToVerify = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
-    return hash === hashToVerify;
+    try {
+        const [salt, hash] = storedHash.split(':');
+        if (!salt || !hash) return false;
+        const hashToVerify = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+        return hash === hashToVerify;
+    } catch (e) {
+        console.error("Error verifying password:", e);
+        return false;
+    }
 }
 
 export async function getNotes(userId: string): Promise<Note[]> {
   await delay(300);
-  const userNotes = notesStore[userId] || [];
-  return userNotes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const notesCol = collection(db, `users/${userId}/notes`);
+  const q = query(notesCol, orderBy("createdAt", "desc"));
+  const notesSnapshot = await getDocs(q);
+  const notesList = notesSnapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+        id: doc.id,
+        userId: userId,
+        content: data.content,
+        // Convert Firestore Timestamp to ISO string
+        createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+        updatedAt: data.updatedAt?.toDate().toISOString() || new Date().toISOString(),
+    } as Note;
+  });
+  return notesList;
 }
 
 export async function addNote(userId: string, content: string, ip?: string): Promise<Note> {
   await delay(300);
-  if (!notesStore[userId]) {
-    notesStore[userId] = [];
-    discoverabilityStore[userId] = false; // Default to not discoverable
+  
+  const userDocRef = doc(db, "users", userId);
+  const userDocSnap = await getDoc(userDocRef);
+
+  if (!userDocSnap.exists() && ip) {
+      await setDoc(userDocRef, { 
+          ip: ip,
+          isDiscoverable: false,
+          createdAt: serverTimestamp()
+      });
+  } else if (ip) {
+      await updateDoc(userDocRef, { ip: ip });
   }
-  if (ip) {
-    ipStore[userId] = ip;
-  }
-  const newNote: Note = {
-    id: crypto.randomUUID(),
+
+  const notesCol = collection(db, `users/${userId}/notes`);
+  const newNoteRef = await addDoc(notesCol, {
+    content: content,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  return {
+    id: newNoteRef.id,
     userId,
     content,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-  notesStore[userId].unshift(newNote);
-  return newNote;
 }
 
 export async function updateNote(userId: string, noteId: string, content: string, ip?: string): Promise<Note | null> {
   await delay(300);
-  const userNotes = notesStore[userId];
-  if (!userNotes) return null;
+  const noteRef = doc(db, `users/${userId}/notes`, noteId);
+  const noteSnap = await getDoc(noteRef);
 
-  const noteIndex = userNotes.findIndex(note => note.id === noteId);
-  if (noteIndex === -1) return null;
-  
+  if (!noteSnap.exists()) return null;
+
   if (ip) {
-    ipStore[userId] = ip;
+    const userDocRef = doc(db, "users", userId);
+    await updateDoc(userDocRef, { ip: ip });
   }
 
-  const updatedNote = {
-    ...userNotes[noteIndex],
+  await updateDoc(noteRef, {
+    content: content,
+    updatedAt: serverTimestamp(),
+  });
+  
+  const updatedNoteData = noteSnap.data();
+
+  return {
+    id: noteId,
+    userId,
     content,
+    createdAt: updatedNoteData.createdAt?.toDate().toISOString() || new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
-  userNotes[noteIndex] = updatedNote;
-  return updatedNote;
 }
 
 export async function deleteNote(userId: string, noteId: string): Promise<{ id: string } | null> {
   await delay(300);
-  const userNotes = notesStore[userId];
-  if (!userNotes) return null;
+  const noteRef = doc(db, `users/${userId}/notes`, noteId);
+  const noteSnap = await getDoc(noteRef);
   
-  const initialLength = userNotes.length;
-  notesStore[userId] = userNotes.filter(note => note.id !== noteId);
+  if (!noteSnap.exists()) return null;
 
-  if (notesStore[userId].length < initialLength) {
-    return { id: noteId };
-  }
-  return null;
+  await deleteDoc(noteRef);
+  return { id: noteId };
 }
 
 
 export async function setPassword(userId: string, password: string): Promise<boolean> {
     await delay(200);
-    if (!notesStore[userId] && userId !== '123456') { // Allow setting password for new spaces
-        notesStore[userId] = [];
+    const userDocRef = doc(db, "users", userId);
+    try {
+        await updateDoc(userDocRef, {
+            passwordHash: hashPassword(password)
+        });
+        return true;
+    } catch (e) {
+        // If the doc doesn't exist, create it
+        await setDoc(userDocRef, {
+            passwordHash: hashPassword(password),
+            createdAt: serverTimestamp()
+        });
+        return true;
     }
-    passwordStore[userId] = hashPassword(password);
-    return true;
 }
 
 export async function getPasswordHash(userId: string): Promise<string | null> {
     await delay(100);
-    return passwordStore[userId] || null;
+    const userDocRef = doc(db, "users", userId);
+    const docSnap = await getDoc(userDocRef);
+    if (docSnap.exists()) {
+        return docSnap.data().passwordHash || null;
+    }
+    return null;
 }
 
 export async function checkPassword(userId: string, password: string): Promise<boolean> {
     await delay(200);
     const hash = await getPasswordHash(userId);
-    if (!hash) return false; // Should not happen if this function is called correctly
+    if (!hash) return false;
     return verifyPassword(password, hash);
 }
 
 export async function getNoteSpacesByIp(ip: string): Promise<string[]> {
     await delay(100);
-    const userIds = Object.entries(ipStore)
-        .filter(([, storedIp]) => storedIp === ip)
-        .map(([userId]) => userId)
-        .filter(userId => discoverabilityStore[userId]); // Only return discoverable spaces
-    return userIds;
+    const usersCol = collection(db, "users");
+    const q = query(usersCol, where("ip", "==", ip), where("isDiscoverable", "==", true));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => doc.id);
 }
 
 export async function setDiscoverableByIp(userId: string, isDiscoverable: boolean): Promise<boolean> {
     await delay(100);
-    if (notesStore[userId]) {
-        discoverabilityStore[userId] = isDiscoverable;
+    const userDocRef = doc(db, "users", userId);
+    try {
+        await updateDoc(userDocRef, { isDiscoverable });
         return true;
+    } catch (e) {
+        // This might fail if the doc doesn't exist yet, which is fine.
+        console.error("Could not set discoverability:", e);
+        return false;
     }
-    return false;
 }
 
 export async function getDiscoverableByIp(userId: string): Promise<boolean> {
     await delay(50);
-    return discoverabilityStore[userId] ?? false;
+    const userDocRef = doc(db, "users", userId);
+    const docSnap = await getDoc(userDocRef);
+    if (docSnap.exists()) {
+        return docSnap.data().isDiscoverable ?? false;
+    }
+    return false;
 }
