@@ -101,7 +101,7 @@ export function CreateNoteForm() {
                       <Textarea
                         ref={textareaRef}
                         placeholder=""
-                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[80px] text-base bg-transparent"
+                        className="resize-none border-0 shadow-none focus-visible:ring-0 overflow-y-hidden min-h-[120px] text-base bg-transparent"
                         {...field}
                         onInput={(e) => {
                           field.onChange(e);
