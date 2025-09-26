@@ -8,14 +8,17 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import SetPassword from './SetPassword';
+import { cn } from '@/lib/utils';
+
 
 interface SettingsProps {
     userId: string;
     isDiscoverable: boolean;
     showSetPassword?: boolean;
+    isInDropdown?: boolean;
 }
 
-export default function Settings({ userId, isDiscoverable, showSetPassword = false }: SettingsProps) {
+export default function Settings({ userId, isDiscoverable, showSetPassword = false, isInDropdown = false }: SettingsProps) {
     const { toast } = useToast();
     const formRef = useRef<HTMLFormElement>(null);
     const [isPending, startTransition] = useTransition();
@@ -43,11 +46,14 @@ export default function Settings({ userId, isDiscoverable, showSetPassword = fal
         });
     }
 
+    const Wrapper = isInDropdown ? 'div' : Card;
+    const ContentWrapper = isInDropdown ? 'div' : CardContent;
+
     return (
-        <Card className="mb-6">
-            <CardContent className="p-0">
-                 <div className="p-4 space-y-4">
-                    <h3 className="text-lg font-medium">Settings</h3>
+        <Wrapper className={cn(!isInDropdown && "mb-6")}>
+            <ContentWrapper className={cn(!isInDropdown && 'p-0')}>
+                 <div className={cn(isInDropdown ? 'space-y-4' : 'p-4 space-y-4')}>
+                    {!isInDropdown && <h3 className="text-lg font-medium">Settings</h3>}
                     <form ref={formRef}>
                         <input type="hidden" name="userId" value={userId} />
                         <div className="flex items-center justify-between space-x-2">
@@ -72,7 +78,7 @@ export default function Settings({ userId, isDiscoverable, showSetPassword = fal
                     </form>
                 </div>
                 {showSetPassword && <SetPassword userId={userId} />}
-            </CardContent>
-        </Card>
+            </ContentWrapper>
+        </Wrapper>
     );
 }

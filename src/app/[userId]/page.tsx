@@ -32,25 +32,9 @@ export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
   }
 
   const initialNotes = await getNotes(userId);
-  const isDiscoverable = await getDiscoverableByIp(userId);
-
-  // Logic to determine if the current user is the creator
-  const creatorTokenFromCookie = cookieStore.get(`notesspace-creator-token-${userId}`)?.value;
-  const creatorTokenFromDb = await getCreatorToken(userId);
-  const isCreator = !!creatorTokenFromCookie && creatorTokenFromCookie === creatorTokenFromDb;
-
-  // The "Set Password" form should only show if:
-  // 1. No password is set.
-  // 2. There's at least one note.
-  // 3. The current visitor is the creator (verified by token).
-  const showSetPassword = !passwordHash && initialNotes.length > 0 && isCreator;
-  
-  // Show settings if the user is authenticated (or no password is set) and there are notes
-  const showSettings = (!passwordHash || isAuthenticated) && initialNotes.length > 0;
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-8">
-      {showSettings && <Settings userId={userId} isDiscoverable={isDiscoverable} showSetPassword={showSetPassword} />}
       <NoteSpace userId={userId} initialNotes={initialNotes} />
     </div>
   );
