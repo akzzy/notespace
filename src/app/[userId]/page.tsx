@@ -13,13 +13,13 @@ interface NoteSpacePageProps {
 
 export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
   const { userId } = params;
-  const cookieStore = await cookies();
-
+  
   // Validation for new user ID format (e.g., AB12)
   if (!/^[A-Z]{2}[0-9]{2}$/.test(userId)) {
     notFound();
   }
   
+  const cookieStore = await cookies();
   const passwordHash = await getPasswordHash(userId);
   const isAuthenticated = cookieStore.get(`notesspace-auth-${userId}`)?.value === 'true';
 
