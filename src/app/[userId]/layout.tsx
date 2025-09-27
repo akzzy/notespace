@@ -1,6 +1,8 @@
+import React from 'react';
 import { Header } from '@/components/Header';
 import { getDiscoverableByIp, getNotes, getPasswordHash, getCreatorToken } from '@/lib/db';
 import { cookies } from 'next/headers';
+import ClientLayout from './components/ClientLayout';
 
 interface NoteSpaceLayoutProps {
   children: React.ReactNode;
@@ -9,36 +11,36 @@ interface NoteSpaceLayoutProps {
   };
 }
 
-export default async function NoteSpaceLayout({
+export default async function NoteSpaceLayoutWrapper({
   children,
   params,
 }: NoteSpaceLayoutProps) {
   const { userId } = params;
+
+  // Validation for new user ID format (e.g., AB12)
+  if (!/^[A-Z]{2}[0-9]{2}$/.test(userId)) {
+    return <>{children}</>;
+  }
+
   const cookieStore = cookies();
   const passwordHash = await getPasswordHash(userId);
   const initialNotes = await getNotes(userId);
 
-  // Logic to determine if the current user is the creator
   const creatorTokenFromCookie = cookieStore.get(`notesspace-creator-token-${userId}`)?.value;
   const creatorTokenFromDb = await getCreatorToken(userId);
   const isCreator = !!creatorTokenFromCookie && creatorTokenFromCookie === creatorTokenFromDb;
 
-  // The "Set Password" option should only show if:
-  // 1. No password is set.
-  // 2. There's at least one note.
-  // 3. The current visitor is the creator (verified by token).
   const showSetPassword = !passwordHash && initialNotes.length > 0 && isCreator;
   const isDiscoverable = await getDiscoverableByIp(userId);
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-background">
-      <Header
-        noteSpaceId={params.userId}
-        isDiscoverable={isDiscoverable}
-        showSetPassword={showSetPassword}
-        notesCount={initialNotes.length}
-      />
-      <main className="flex-1">{children}</main>
-    </div>
+    <ClientLayout
+      userId={userId}
+      isDiscoverable={isDiscoverable}
+      showSetPassword={showSetPassword}
+      notesCount={initialNotes.length}
+    >
+      {children}
+    </ClientLayout>
   );
 }
