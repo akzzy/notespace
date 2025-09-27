@@ -22,7 +22,7 @@ export default async function NoteSpaceLayoutWrapper({
     return <>{children}</>;
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const passwordHash = await getPasswordHash(userId);
   const initialNotes = await getNotes(userId);
 
