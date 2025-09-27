@@ -1,5 +1,4 @@
 import React from 'react';
-import { Header } from '@/components/Header';
 import { getDiscoverableByIp, getNotes, getPasswordHash, getCreatorToken } from '@/lib/db';
 import { cookies } from 'next/headers';
 import ClientLayout from './components/ClientLayout';
@@ -13,14 +12,15 @@ interface NoteSpaceLayoutProps {
 
 export default async function NoteSpaceLayoutWrapper({
   children,
-  params: { userId },
+  params,
 }: NoteSpaceLayoutProps) {
+  const { userId } = params;
   // Validation for new user ID format (e.g., AB12)
   if (!/^[A-Z]{2}[0-9]{2}$/.test(userId)) {
     return <>{children}</>;
   }
 
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
   const passwordHash = await getPasswordHash(userId);
   const initialNotes = await getNotes(userId);
 
