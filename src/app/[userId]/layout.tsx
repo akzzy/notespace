@@ -12,9 +12,8 @@ interface NoteSpaceLayoutProps {
 
 export default async function NoteSpaceLayoutWrapper({
   children,
-  params,
+  params: { userId },
 }: NoteSpaceLayoutProps) {
-  const { userId } = params;
   // Validation for new user ID format (e.g., AB12)
   if (!/^[A-Z]{2}[0-9]{2}$/.test(userId)) {
     return <>{children}</>;
