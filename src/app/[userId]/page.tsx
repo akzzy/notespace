@@ -11,9 +11,7 @@ interface NoteSpacePageProps {
   };
 }
 
-export default async function NoteSpacePage({ params }: NoteSpacePageProps) {
-  const { userId } = params;
-  
+export default async function NoteSpacePage({ params: { userId } }: NoteSpacePageProps) {
   // Validation for new user ID format (e.g., AB12)
   if (!/^[A-Z]{2}[0-9]{2}$/.test(userId)) {
     notFound();
