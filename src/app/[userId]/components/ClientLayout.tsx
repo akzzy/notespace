@@ -32,7 +32,7 @@ export default function ClientLayout({
 
         // Filter out invalid entries and the current userId to avoid duplicates and put it at the top
         const cleanedRecents = recents.filter((id: any) => id && typeof id === 'string' && id !== 'undefined' && id !== userId);
-        const updatedRecents = [userId, ...cleanedRecents].slice(0, 5); // Keep last 5
+        const updatedRecents = [userId, ...cleanedRecents].slice(0, 4); // Keep last 4
         
         localStorage.setItem('recentNoteSpaces', JSON.stringify(updatedRecents));
 

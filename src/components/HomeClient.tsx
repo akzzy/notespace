@@ -63,8 +63,8 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
                 <CardTitle>Recently Visited</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col gap-2">
-                  {allSpaces.map(spaceId => (
+                <div className="grid grid-cols-2 gap-2">
+                  {allSpaces.slice(0, 4).map(spaceId => (
                     <Link href={`/${spaceId}`} key={spaceId}>
                       <Button variant="outline" className="w-full justify-center font-mono text-lg tracking-widest h-11">
                         {spaceId}
