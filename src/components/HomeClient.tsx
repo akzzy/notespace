@@ -37,7 +37,7 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
         <CreateNoteForm />
       </div>
 
-      <div className="mt-12 w-full max-w-md">
+      <div className="mt-12 w-full max-w-3xl">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
@@ -49,25 +49,28 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
           </div>
         </div>
       </div>
+      
+      <div className="mt-6 w-full max-w-3xl flex flex-col md:flex-row gap-8 justify-center items-start">
+        <div className="w-full max-w-sm mx-auto">
+          <JoinSpaceForm />
+        </div>
 
-      <div className="mt-6 w-full max-w-sm">
-        <JoinSpaceForm />
+        {allSpaces.length > 0 && (
+          <div className="w-full max-w-sm mx-auto">
+            <h2 className="text-lg font-semibold text-muted-foreground mb-4 text-center md:text-left">Recently Visited</h2>
+            <div className="flex flex-col gap-2">
+              {allSpaces.map(spaceId => (
+                <Link href={`/${spaceId}`} key={spaceId}>
+                  <Button variant="outline" className="w-full justify-center font-mono text-lg tracking-widest h-11">
+                    {spaceId}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {allSpaces.length > 0 && (
-        <div className="mt-16 w-full max-w-sm">
-          <h2 className="text-lg font-semibold text-muted-foreground mb-4">Recently Visited</h2>
-          <div className="flex flex-col gap-2">
-            {allSpaces.map(spaceId => (
-              <Link href={`/${spaceId}`} key={spaceId}>
-                <Button variant="outline" className="w-full justify-center font-mono text-lg tracking-widest h-11">
-                  {spaceId}
-                </Button>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </>
   );
 }
