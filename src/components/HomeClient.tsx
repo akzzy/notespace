@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { CreateNoteForm } from '@/components/CreateNoteForm';
 import { JoinSpaceForm } from '@/components/JoinSpaceForm';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface HomeClientProps {
   discoverableSpaces: string[];
@@ -52,27 +53,29 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
         </div>
       </div>
       
-      <div className="mt-6 w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
-        <div className="w-full max-w-sm mx-auto">
+      <div className="mt-6 w-full max-w-3xl flex flex-col md:flex-row gap-8 justify-center">
+        <div className="w-full max-w-sm mx-auto flex-1 flex flex-col">
           <JoinSpaceForm />
         </div>
 
         {allSpaces.length > 0 && (
-          <div className="w-full max-w-sm mx-auto">
-            <Card>
-              <CardHeader className="text-center pb-4">
+          <div className="w-full max-w-sm mx-auto flex-1 flex flex-col">
+            <Card className="flex flex-col flex-1">
+              <CardHeader className="text-center">
                 <CardTitle>Recently Visited</CardTitle>
               </CardHeader>
-              <CardContent className="pt-2">
-                <div className="grid grid-cols-2 gap-2">
-                  {allSpaces.slice(0, 4).map(spaceId => (
-                    <Link href={`/${spaceId}`} key={spaceId}>
-                      <Button variant="outline" className="w-full justify-center font-mono text-base tracking-widest h-11">
-                        {spaceId}
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
+              <CardContent className="flex-1 flex flex-col">
+                <ScrollArea className="flex-1">
+                    <div className="grid grid-cols-2 gap-2 pr-6">
+                    {allSpaces.slice(0, 4).map(spaceId => (
+                        <Link href={`/${spaceId}`} key={spaceId}>
+                        <Button variant="outline" className="w-full justify-center font-mono text-base tracking-widest h-11">
+                            {spaceId}
+                        </Button>
+                        </Link>
+                    ))}
+                    </div>
+                </ScrollArea>
               </CardContent>
             </Card>
           </div>
