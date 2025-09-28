@@ -21,8 +21,11 @@ export default function ClientLayout({
   
   useEffect(() => {
     if (userId && typeof userId === 'string' && userId !== 'undefined') {
-      // Save the current notespace to a list of recent spaces
       try {
+        // Save the single last visited space
+        localStorage.setItem('lastNoteSpaceId', userId);
+
+        // Save the current notespace to a list of recent spaces
         const storedRecents = localStorage.getItem('recentNoteSpaces');
         let recents = storedRecents ? JSON.parse(storedRecents) : [];
         if (!Array.isArray(recents)) recents = [];
