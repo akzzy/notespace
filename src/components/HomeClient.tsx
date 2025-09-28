@@ -52,7 +52,7 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
         </div>
       </div>
       
-      <div className="mt-6 w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8 justify-center items-start">
+      <div className="mt-6 w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8 justify-center">
         <div className="w-full max-w-sm mx-auto">
           <JoinSpaceForm />
         </div>
