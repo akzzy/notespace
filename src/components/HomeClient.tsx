@@ -66,7 +66,7 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
                 <div className="grid grid-cols-2 gap-2">
                   {allSpaces.slice(0, 4).map(spaceId => (
                     <Link href={`/${spaceId}`} key={spaceId}>
-                      <Button variant="outline" className="w-full justify-center font-mono text-lg tracking-widest h-11">
+                      <Button variant="outline" className="w-full justify-center font-mono text-base tracking-widest h-11">
                         {spaceId}
                       </Button>
                     </Link>
