@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { CreateNoteForm } from '@/components/CreateNoteForm';
 import { JoinSpaceForm } from '@/components/JoinSpaceForm';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 interface HomeClientProps {
   discoverableSpaces: string[];
@@ -61,8 +61,9 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
             <Card>
               <CardHeader className="text-center">
                 <CardTitle>Recently Visited</CardTitle>
+                <CardDescription>Select one of your recent spaces.</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2.5">
                 <div className="grid grid-cols-2 gap-2">
                   {allSpaces.slice(0, 4).map(spaceId => (
                     <Link href={`/${spaceId}`} key={spaceId}>
