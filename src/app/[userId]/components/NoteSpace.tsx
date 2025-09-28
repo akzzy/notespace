@@ -26,7 +26,7 @@ const NoteSchema = z.object({
   content: z
     .string()
     .min(1, { message: 'Note cannot be empty.' })
-    .max(5000, { message: 'Note must be 5000 characters or less.' }),
+    .max(100000, { message: 'Note must be 100000 characters or less.' }),
 });
 
 type NoteFormData = z.infer<typeof NoteSchema>;

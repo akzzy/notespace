@@ -9,7 +9,7 @@ import type { Note } from './types';
 
 
 const NoteSchema = z.object({
-  content: z.string().min(1).max(10000),
+  content: z.string().min(1).max(100000),
   userId: z.string(),
 });
 

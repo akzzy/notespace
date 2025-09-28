@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 
 const CreateNoteSchema = z.object({
-  content: z.string().min(1, { message: 'Note cannot be empty.' }).max(10000, { message: 'Note is too long.' }),
+  content: z.string().min(1, { message: 'Note cannot be empty.' }).max(100000, { message: 'Note is too long.' }),
 });
 
 type CreateNoteFormData = z.infer<typeof CreateNoteSchema>;
