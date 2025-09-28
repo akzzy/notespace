@@ -59,11 +59,11 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
         {allSpaces.length > 0 && (
           <div className="w-full max-w-sm mx-auto">
             <Card>
-              <CardHeader className="text-center">
+              <CardHeader className="text-center pb-4">
                 <CardTitle>Recently Visited</CardTitle>
                 <CardDescription>Select one of your recent spaces.</CardDescription>
               </CardHeader>
-              <CardContent className="pt-2.5">
+              <CardContent>
                 <div className="grid grid-cols-2 gap-2">
                   {allSpaces.slice(0, 4).map(spaceId => (
                     <Link href={`/${spaceId}`} key={spaceId}>
