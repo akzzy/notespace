@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { CreateNoteForm } from '@/components/CreateNoteForm';
 import { JoinSpaceForm } from '@/components/JoinSpaceForm';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface HomeClientProps {
   discoverableSpaces: string[];
@@ -50,23 +51,29 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
         </div>
       </div>
       
-      <div className="mt-6 w-full max-w-3xl flex flex-col md:flex-row gap-8 justify-center items-start">
+      <div className="mt-6 w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8 justify-center items-start">
         <div className="w-full max-w-sm mx-auto">
           <JoinSpaceForm />
         </div>
 
         {allSpaces.length > 0 && (
           <div className="w-full max-w-sm mx-auto">
-            <h2 className="text-lg font-semibold text-muted-foreground mb-4 text-center md:text-left">Recently Visited</h2>
-            <div className="flex flex-col gap-2">
-              {allSpaces.map(spaceId => (
-                <Link href={`/${spaceId}`} key={spaceId}>
-                  <Button variant="outline" className="w-full justify-center font-mono text-lg tracking-widest h-11">
-                    {spaceId}
-                  </Button>
-                </Link>
-              ))}
-            </div>
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle>Recently Visited</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-2">
+                  {allSpaces.map(spaceId => (
+                    <Link href={`/${spaceId}`} key={spaceId}>
+                      <Button variant="outline" className="w-full justify-center font-mono text-lg tracking-widest h-11">
+                        {spaceId}
+                      </Button>
+                    </Link>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>

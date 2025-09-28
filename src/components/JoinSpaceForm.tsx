@@ -50,7 +50,7 @@ export function JoinSpaceForm() {
   return (
     <Card>
         <CardHeader className="text-center">
-            <CardTitle>Join a Note Space</CardTitle>
+            <CardTitle>Join a NoteSpace</CardTitle>
             <CardDescription>Enter your 4-character code below.</CardDescription>
         </CardHeader>
       <CardContent>
@@ -74,7 +74,7 @@ export function JoinSpaceForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isPending} size="lg" className="h-11">
+            <Button type="submit" disabled={isPending} className="h-11">
               {isPending ? (
                 <Loader2 className="animate-spin" />
               ) : (
