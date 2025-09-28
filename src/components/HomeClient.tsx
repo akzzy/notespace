@@ -59,7 +59,7 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
           <h2 className="text-lg font-semibold text-muted-foreground mb-4">Recently Visited</h2>
           <div className="flex flex-col gap-2">
             {allSpaces.map(spaceId => (
-              <Link href={`/${spaceId}`} key={spaceId} legacyBehavior>
+              <Link href={`/${spaceId}`} key={spaceId}>
                 <Button variant="outline" className="w-full justify-center font-mono text-lg tracking-widest h-11">
                   {spaceId}
                 </Button>
