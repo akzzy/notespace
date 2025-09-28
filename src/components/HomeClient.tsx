@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -61,9 +62,8 @@ export default function HomeClient({ discoverableSpaces }: HomeClientProps) {
             <Card>
               <CardHeader className="text-center pb-4">
                 <CardTitle>Recently Visited</CardTitle>
-                <CardDescription>Select one of your recent spaces.</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2">
                 <div className="grid grid-cols-2 gap-2">
                   {allSpaces.slice(0, 4).map(spaceId => (
                     <Link href={`/${spaceId}`} key={spaceId}>
