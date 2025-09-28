@@ -24,6 +24,12 @@ const verifyPassword = (password: string, storedHash: string) => {
     }
 }
 
+export async function userExists(userId: string): Promise<boolean> {
+    const userDocRef = doc(db, "users", userId);
+    const docSnap = await getDoc(userDocRef);
+    return docSnap.exists();
+}
+
 export async function getNotes(userId: string): Promise<Note[]> {
   await delay(300);
   const notesCol = collection(db, `users/${userId}/notes`);

@@ -13,6 +13,16 @@ const NoteSchema = z.object({
   userId: z.string(),
 });
 
+const generateUserId = () => {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const part1 = letters.charAt(Math.floor(Math.random() * letters.length));
+    const part2 = letters.charAt(Math.floor(Math.random() * letters.length));
+    const part3 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+    const part4 = numbers.charAt(Math.floor(Math.random() * numbers.length));
+    return `${part1}${part2}${part3}${part4}`;
+};
+
 export async function addNoteAction(
   prevState: { message: string, note?: Note },
   formData: FormData
@@ -26,14 +36,37 @@ export async function addNoteAction(
     return { message: 'Failed to create note.' };
   }
   
-  const { userId, content } = validatedFields.data;
+  let { userId, content } = validatedFields.data;
   const ip = headers().get('x-forwarded-for') ?? '::1';
 
   try {
-    // Check if this is the first note for this user
-    const isFirstNote = !(await db.getCreatorIp(userId));
+    let isFirstNote = false;
+    let newNote: (Note & { creatorToken?: string | undefined; }) | null = null;
+    
+    // If userId is '__new__', we're creating a new space and need to generate a unique ID.
+    if (userId === '__new__') {
+        isFirstNote = true;
+        let newUserId;
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        // Loop to find a unique userId
+        do {
+            newUserId = generateUserId();
+            attempts++;
+            if (attempts > maxAttempts) {
+                // If we can't find a unique ID after 10 tries, something is very wrong.
+                throw new Error("Failed to generate a unique user ID.");
+            }
+        } while (await db.userExists(newUserId));
 
-    const newNote = await db.addNote(userId, content, ip);
+        userId = newUserId; // Use the newly generated unique ID
+    } else {
+        // If an existing userId is provided, check if it's the first note for this user.
+        isFirstNote = !(await db.getCreatorIp(userId));
+    }
+
+    newNote = await db.addNote(userId, content, ip);
 
     // If it's the first note, set the creator token cookie
     if (isFirstNote && newNote.creatorToken) {

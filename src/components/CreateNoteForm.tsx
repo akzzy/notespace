@@ -20,16 +20,6 @@ const CreateNoteSchema = z.object({
 
 type CreateNoteFormData = z.infer<typeof CreateNoteSchema>;
 
-const generateUserId = () => {
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  const numbers = '0123456789';
-  const part1 = letters.charAt(Math.floor(Math.random() * letters.length));
-  const part2 = letters.charAt(Math.floor(Math.random() * letters.length));
-  const part3 = numbers.charAt(Math.floor(Math.random() * numbers.length));
-  const part4 = numbers.charAt(Math.floor(Math.random() * numbers.length));
-  return `${part1}${part2}${part3}${part4}`;
-}
-
 
 export function CreateNoteForm() {
   const [isPending, startTransition] = useTransition();
@@ -60,20 +50,20 @@ export function CreateNoteForm() {
   };
 
   const onSubmit: SubmitHandler<CreateNoteFormData> = (data) => {
-    const userId = generateUserId();
     const formData = new FormData();
     formData.append('content', data.content);
-    formData.append('userId', userId);
+    // Signal to the server to generate a new, unique ID
+    formData.append('userId', '__new__');
 
     startTransition(async () => {
       const result = await addNoteAction({ message: '' }, formData);
 
-      if (result?.message === 'Added note.') {
-        router.push(`/${userId}`);
+      if (result?.note?.userId) {
+        router.push(`/${result.note.userId}`);
       } else {
         toast({
           title: 'Error',
-          description: 'Failed to create NoteSpace. Please try again.',
+          description: result.message || 'Failed to create NoteSpace. Please try again.',
           variant: 'destructive',
         });
       }
